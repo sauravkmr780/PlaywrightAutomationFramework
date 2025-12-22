@@ -508,7 +508,172 @@ const context = await browser.newContext({
 
 ## 🔧 CI/CD Setup
 
-### Jenkins Configuration
+### GitHub Actions (Recommended)
+
+#### Overview
+This project includes two GitHub Actions workflows:
+1. **playwright.yml** - Automated CI/CD pipeline
+2. **manual-trigger.yml** - Manual test execution with parameters
+
+#### Setup Instructions
+
+**Step 1: Enable GitHub Pages (for Allure Reports)**
+1. Go to your repository on GitHub
+2. Navigate to **Settings** → **Pages**
+3. Under **Source**, select:
+   - Branch: `gh-pages`
+   - Folder: `/root`
+4. Click **Save**
+5. Your Allure reports will be available at: `https://<username>.github.io/<repo>/allure-report/`
+
+**Step 2: Push Workflows to GitHub**
+```bash
+git add .github/workflows/
+git commit -m "Add GitHub Actions CI/CD pipeline"
+git push origin master
+```
+
+**Step 3: Verify Workflow Setup**
+1. Go to **Actions** tab in your GitHub repository
+2. You should see two workflows:
+   - "Playwright Tests" - Runs automatically
+   - "Manual Test Run" - Manual trigger
+
+#### Automated Pipeline (playwright.yml)
+
+**Triggers:**
+- ✅ Push to `master` or `main` branch
+- ✅ Pull requests to `master` or `main`
+- ✅ Manual dispatch (workflow_dispatch)
+- ✅ Scheduled runs (daily at 9 AM UTC)
+
+**Jobs:**
+
+**1. test (Matrix Strategy)**
+- Runs all tests on Node.js 18 and 20
+- Installs Playwright browsers (Chromium)
+- Executes: `npm run test`
+- Uploads Playwright report and test results as artifacts
+
+**2. test-smoke**
+- Runs smoke tests tagged with `@smoke`
+- Generates Allure report
+- Uploads Allure report as artifact
+- Deploys Allure report to GitHub Pages (on master branch)
+
+**Viewing Reports:**
+```bash
+# After workflow completes:
+# 1. Go to Actions → Select workflow run
+# 2. Scroll to "Artifacts" section
+# 3. Download: playwright-report, test-results, or allure-report
+
+# Or view Allure report online:
+https://<username>.github.io/<repo>/allure-report/
+```
+
+#### Manual Test Execution (manual-trigger.yml)
+
+**How to Run:**
+1. Go to **Actions** tab
+2. Select "Manual Test Run" workflow
+3. Click **Run workflow**
+4. Configure parameters:
+   - **Test tag**: Choose `@smoke`, `@regression`, `@sanity`, or `all`
+   - **Browser**: Choose `chromium`, `firefox`, `webkit`, or `all`
+5. Click **Run workflow**
+
+**Use Cases:**
+- Run specific test suites on-demand
+- Test on different browsers
+- Execute before release
+- Debug specific test scenarios
+
+#### Workflow Configuration Files
+
+**`.github/workflows/playwright.yml`**
+```yaml
+name: Playwright Tests
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * *'  # Daily at 9 AM UTC
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    # ... (see file for full configuration)
+  
+  test-smoke:
+    runs-on: ubuntu-latest
+    # ... (generates and deploys Allure reports)
+```
+
+**`.github/workflows/manual-trigger.yml`**
+```yaml
+name: Manual Test Run
+on:
+  workflow_dispatch:
+    inputs:
+      test_tag:
+        description: 'Test tag to run'
+        required: true
+        type: choice
+        options: ['@smoke', '@regression', '@sanity', 'all']
+      browser:
+        description: 'Browser to run tests on'
+        required: true
+        type: choice
+        options: ['chromium', 'firefox', 'webkit', 'all']
+```
+
+#### Troubleshooting
+
+**Workflow Fails:**
+```bash
+# Check workflow logs in Actions tab
+# Common issues:
+# 1. Node modules cache issue → Clear cache and re-run
+# 2. Browser installation timeout → Check network
+# 3. Test failures → Review Playwright report artifact
+```
+
+**GitHub Pages Not Working:**
+```bash
+# Verify:
+# 1. Settings → Pages → Source is set to gh-pages
+# 2. Check if gh-pages branch exists
+# 3. Wait 2-3 minutes after first deployment
+```
+
+**Allure Report Not Generated:**
+```bash
+# Ensure allure-playwright is installed:
+npm install -D allure-playwright
+
+# Verify reporter in playwright.config.ts:
+reporter: [['allure-playwright', { outputFolder: 'allure-results' }]]
+```
+
+#### CI/CD Best Practices
+
+1. **Run smoke tests on every PR** → Fast feedback
+2. **Full test suite on merge to master** → Comprehensive validation
+3. **Scheduled runs** → Catch environment issues early
+4. **Artifact retention** → Keep reports for 30 days
+5. **Matrix testing** → Test on multiple Node versions
+6. **Continue on error** → Generate reports even if tests fail
+
+---
+
+### Jenkins Configuration (Local Setup)
 
 **Installation:**
 ```bash

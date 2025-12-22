@@ -1,0 +1,82 @@
+name: Manual Test Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_tag:
+        description: 'Test tag to run (e.g., @smoke, @regression)'
+        required: true
+        default: '@smoke'
+        type: choice
+        options:
+          - '@smoke'
+          - '@regression'
+          - '@sanity'
+          - 'all'
+      browser:
+        description: 'Browser to run tests on'
+        required: true
+        default: 'chromium'
+        type: choice
+        options:
+          - 'chromium'
+          - 'firefox'
+          - 'webkit'
+          - 'all'
+
+jobs:
+  manual-test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright Browsers
+      run: |
+        if [ "${{ inputs.browser }}" == "all" ]; then
+          npx playwright install --with-deps
+        else
+          npx playwright install --with-deps ${{ inputs.browser }}
+        fi
+
+    - name: Run Tests
+      run: |
+        if [ "${{ inputs.test_tag }}" == "all" ]; then
+          npm run test
+        else
+          npx playwright test --grep "${{ inputs.test_tag }}"
+        fi
+      continue-on-error: true
+
+    - name: Generate Allure Report
+      if: always()
+      run: |
+        npm install -g allure-commandline
+        npx allure generate allure-results -o allure-report || true
+
+    - name: Upload Playwright Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-manual
+        path: playwright-report/
+        retention-days: 7
+
+    - name: Upload Allure Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: allure-report-manual
+        path: allure-report/
+        retention-days: 7

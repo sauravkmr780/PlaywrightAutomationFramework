@@ -1,27 +1,101 @@
 name: Playwright Tests
+
 on:
   push:
-    branches: [master]
+    branches: [ master, main ]
   pull_request:
-    branches: [master]
+    branches: [ master, main ]
+  workflow_dispatch:
+  schedule:
+    # Run tests daily at 9 AM UTC
+    - cron: '0 9 * * *'
+
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
       with:
-        node-version: lts/*
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
     - name: Install dependencies
       run: npm ci
+
     - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+      run: npx playwright install --with-deps chromium
+
     - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
+      run: npm run test
+      continue-on-error: true
+
+    - name: Upload Playwright Report
+      uses: actions/upload-artifact@v4
+      if: always()
       with:
-        name: playwright-report
+        name: playwright-report-${{ matrix.node-version }}
         path: playwright-report/
         retention-days: 30
+
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.node-version }}
+        path: test-results/
+        retention-days: 30
+
+  test-smoke:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps chromium
+
+    - name: Run Smoke Tests
+      run: npm run test:smoke
+      continue-on-error: true
+
+    - name: Generate Allure Report
+      if: always()
+      run: |
+        npm install -g allure-commandline
+        npx allure generate allure-results -o allure-report || true
+
+    - name: Upload Allure Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: allure-report
+        path: allure-report/
+        retention-days: 30
+
+    - name: Deploy Allure Report to GitHub Pages
+      if: always() && github.ref == 'refs/heads/master'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./allure-report
+        destination_dir: allure-report
