@@ -14,6 +14,7 @@ A comprehensive test automation framework built with Playwright and TypeScript f
 - [Reporting](#reporting)
 - [Best Practices](#best-practices)
 - [CI/CD Setup](#cicd-setup)
+- [Playwright AI Agents (MCP)](#playwright-ai-agents-mcp)
 
 ## 🎯 Why Playwright?
 
@@ -850,4 +851,116 @@ Saurav Kumar
 
 [GitHub Repository](https://github.com/sauravkmr780/PlaywrightAutomationFramework)
 
+---
 
+## 🤖 Playwright AI Agents (MCP)
+
+### What is MCP?
+
+**MCP (Model Context Protocol)** enables AI agents to transition from **Ask Mode** (answering questions) to **Agent Mode** (autonomously writing and executing code by accessing URLs and application context).
+
+### Overview
+
+Playwright AI Agents leverage GitHub Copilot with MCP to automate test planning, generation, and healing. These agents can explore web applications, create test plans, write test cases, and automatically fix failing tests.
+
+### Three Agent Types
+
+| Agent      | Purpose                                                                 |
+| ---------- | ----------------------------------------------------------------------- |
+| **Planner** | Explores the application and creates comprehensive test plans           |
+| **Generator** | Writes test cases based on planner's test plan or user requirements    |
+| **Healer** | Automatically fixes failing tests by analyzing errors and updating code |
+
+### Installation
+
+#### 1. Install Playwright MCP Extension
+
+In VS Code, install the Playwright MCP extension to enable AI agent capabilities:
+- Search for "Playwright MCP" in VS Code Extensions
+- Install the extension
+- Restart VS Code if needed
+
+#### 2. Initialize Playwright Test Agents
+
+Run the following command to set up agents in your project:
+
+```bash
+npx playwright init-agents --loop=vscode
+```
+
+This creates a `seed.spec.ts` file which serves as the entry point for agent operations.
+
+### How It Works
+
+#### seed.spec.ts
+The seed file is where you specify the starting point for the AI agents:
+- **Planner**: Starts from this file to explore the app and generate test plans
+- **Generator**: Uses the test plan to write comprehensive test cases
+- **Healer**: Monitors test execution and auto-fixes failures
+
+### Usage Examples
+
+#### Step 1: Using the Planner Agent
+
+Ask GitHub Copilot to explore the application and create a test plan:
+
+```
+go to app - https://rahulshettyacademy.com/seleniumPractise/
+explore the app &
+please do test plan
+```
+
+The Planner will:
+- Navigate to the specified URL
+- Explore all features and user flows
+- Identify test scenarios
+- Generate a comprehensive test plan
+
+#### Step 2: Using the Generator Agent
+
+Ask Copilot to write test cases based on the plan:
+
+```
+add test for all scenarios.
+```
+
+The Generator will:
+- Read the test plan from the Planner
+- Write complete test cases with assertions
+- Follow Playwright best practices
+- Include proper locators and wait strategies
+
+#### Step 3: Using the Healer Agent
+
+When tests fail, the Healer automatically:
+- Analyzes the failure reason
+- Identifies incorrect selectors or timing issues
+- Updates the test code
+- Re-runs the test to verify the fix
+
+### Benefits
+
+✅ **Faster Test Creation**: Generate tests in minutes, not hours
+✅ **Intelligent Exploration**: AI understands application structure
+✅ **Auto-Healing**: Reduce maintenance effort with self-healing tests
+✅ **Best Practices**: Generated code follows Playwright conventions
+✅ **Comprehensive Coverage**: Planner identifies edge cases and scenarios
+
+### Example Workflow
+
+1. **Create seed.spec.ts** with the starting URL
+2. **Ask Planner** to explore the app and create a test plan
+3. **Ask Generator** to write test cases for all scenarios
+4. **Run Tests** using `npx playwright test`
+5. **Healer Fixes** any failures automatically
+6. **Review & Commit** the generated and healed tests
+
+### Tips for Best Results
+
+- Provide clear URLs and context to the Planner
+- Be specific about scenarios you want to test
+- Review generated tests before committing
+- Use descriptive prompts for better AI understanding
+- Leverage Healer for flaky test stabilization
+
+---
