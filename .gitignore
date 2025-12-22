@@ -1,0 +1,58 @@
+# Node.js dependencies
+node_modules/
+
+# Playwright test results and reports
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+/allure-results/
+/allure-report/
+/.allure/
+
+# Test artifacts
+sessionStorage.json
+downloads/
+*.xlsx
+*.pdf
+*.zip
+*.png
+*.jpg
+*.jpeg
+
+# Build outputs
+dist/
+build/
+out/
+*.js.map
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Debug files
+debug.log
+trace/

@@ -1,0 +1,40 @@
+{
+  "name": "playwrightautomationframework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:watch": "npx playwright test --ui",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "test:smoke": "npx playwright test --grep \"@smoke\"",
+    "test:smoke:report": "npm run test:smoke && npm run report:allure:generate && npm run report:allure:open",
+    "report:html": "npx playwright show-report",
+    "report:allure": "npx allure generate allure-results -o allure-report && npx allure open allure-report",
+    "report:allure:generate": "npx allure generate allure-results -o allure-report",
+    "report:allure:open": "npx allure open allure-report",
+    "report:clean": "Remove-Item -Recurse -Force allure-report,allure-results,playwright-report,test-results -ErrorAction SilentlyContinue"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sauravkmr780/PlaywrightAutomationFramework.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sauravkmr780/PlaywrightAutomationFramework/issues"
+  },
+  "homepage": "https://github.com/sauravkmr780/PlaywrightAutomationFramework#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^24.10.4",
+    "allure-playwright": "^3.4.3"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "xlsx": "^0.18.5"
+  }
+}
