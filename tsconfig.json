@@ -12,6 +12,6 @@
     "skipLibCheck": true,
     "types": ["node", "@playwright/test"]
   },
-  "include": ["tests/**/*.ts"],
+  "include": ["tests/**/*.ts", "playwright.config.ts", "playwright.config1.ts"],
   "exclude": ["node_modules"]
 }

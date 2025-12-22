@@ -1,4 +1,7 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
+
+// Check if running in CI environment
+const isCI = typeof process !== 'undefined' && !!process.env?.CI;
 
 export default defineConfig({
   testDir: './tests',
@@ -17,12 +20,12 @@ export default defineConfig({
     
     baseURL: 'https://rahulshettyacademy.com',
     browserName: 'chromium',
-    headless: false,
+    headless: isCI, // Run headless in CI, headed locally
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
-    viewport: null, // Set to null to use full screen
+    viewport: isCI ? { width: 1280, height: 720 } : null, // Fixed viewport in CI, fullscreen locally
     launchOptions: {
-      args: ['--start-maximized'] // Launch browser in maximized mode
+      args: isCI ? [] : ['--start-maximized'] // Start maximized only locally
     },
     acceptDownloads: true, // Enable file downloads
     ignoreHTTPSErrors: true, // Ignore HTTPS errors
