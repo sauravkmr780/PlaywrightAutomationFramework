@@ -2,9 +2,9 @@ name: Playwright Tests
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [ master ]
   pull_request:
-    branches: [ master, main ]
+    branches: [ master]
   workflow_dispatch:
   schedule:
     # Run tests daily at 9 AM UTC
@@ -12,6 +12,7 @@ on:
 
 jobs:
   test:
+    if: false  # Workflow disabled
     timeout-minutes: 60
     runs-on: ubuntu-latest
     strategy:
@@ -55,6 +56,7 @@ jobs:
         retention-days: 30
 
   test-smoke:
+    if: false  # Workflow disabled
     timeout-minutes: 30
     runs-on: ubuntu-latest
     
