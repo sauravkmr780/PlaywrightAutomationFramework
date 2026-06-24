@@ -26,7 +26,6 @@ A comprehensive test automation framework built with Playwright and TypeScript f
 - ✅ Chrome
 - ✅ Firefox
 - ✅ Edge
-- ✅ Opera
 - ✅ Safari (WebKit)
 
 ### Multi-Platform Support
